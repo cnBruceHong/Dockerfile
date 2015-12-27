@@ -1,0 +1,21 @@
+FROM ubuntu:latest
+MAINTAINER cnbrucehong <cnbrucehong@icloud.com>
+RUN mv /etc/apt/sources.list /etc/apt/sources.list.backup
+RUN echo "\
+deb http://mirrors.aliyun.com/ubuntu/ trusty main restricted universe multiverse \n\
+deb http://mirrors.aliyun.com/ubuntu/ trusty-security main restricted universe multiverse \n\
+deb http://mirrors.aliyun.com/ubuntu/ trusty-updates main restricted universe multiverse \n\
+deb http://mirrors.aliyun.com/ubuntu/ trusty-proposed main restricted universe multiverse \n\
+deb http://mirrors.aliyun.com/ubuntu/ trusty-backports main restricted universe multiverse \n\
+deb-src http://mirrors.aliyun.com/ubuntu/ trusty main restricted universe multiverse \n\
+deb-src http://mirrors.aliyun.com/ubuntu/ trusty-security main restricted universe multiverse \n\
+deb-src http://mirrors.aliyun.com/ubuntu/ trusty-updates main restricted universe multiverse \n\
+deb-src http://mirrors.aliyun.com/ubuntu/ trusty-proposed main restricted universe multiverse \n\
+deb-src http://mirrors.aliyun.com/ubuntu/ trusty-backports main restricted universe multiverse \
+" > /etc/apt/sources.list
+RUN apt-get update \
+  && apt-get install -y wget curl vim \
+  # 用完包管理器后安排打扫卫生可以显著的减少镜像大小
+  && apt-get clean \
+  && apt-get autoclean \
+  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
