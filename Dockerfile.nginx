@@ -1,21 +1,25 @@
-FROM ubuntu:latest
+FROM brucehong/ubuntu
+
 MAINTAINER cnbrucehong <cnbrucehong@icloud.com>
-RUN mv /etc/apt/sources.list /etc/apt/sources.list.backup
+
 RUN echo "\
-deb http://mirrors.aliyun.com/ubuntu/ trusty main restricted universe multiverse \n\
-deb http://mirrors.aliyun.com/ubuntu/ trusty-security main restricted universe multiverse \n\
-deb http://mirrors.aliyun.com/ubuntu/ trusty-updates main restricted universe multiverse \n\
-deb http://mirrors.aliyun.com/ubuntu/ trusty-proposed main restricted universe multiverse \n\
-deb http://mirrors.aliyun.com/ubuntu/ trusty-backports main restricted universe multiverse \n\
-deb-src http://mirrors.aliyun.com/ubuntu/ trusty main restricted universe multiverse \n\
-deb-src http://mirrors.aliyun.com/ubuntu/ trusty-security main restricted universe multiverse \n\
-deb-src http://mirrors.aliyun.com/ubuntu/ trusty-updates main restricted universe multiverse \n\
-deb-src http://mirrors.aliyun.com/ubuntu/ trusty-proposed main restricted universe multiverse \n\
-deb-src http://mirrors.aliyun.com/ubuntu/ trusty-backports main restricted universe multiverse \
-" > /etc/apt/sources.list
-RUN apt-get update \
-  && apt-get install -y wget curl vim \
-  # 用完包管理器后安排打扫卫生可以显著的减少镜像大小
-  && apt-get clean \
+	nameserver 223.5.5.5\n\
+	nameserver 8.8.8.8\n\
+" > /etc/resolvconf/resolv.conf.d/base
+
+RUN resolvconf -u
+
+RUN cd && wget http://nginx.org/keys/nginx_signing.key && sudo apt-key add nginx_signing.key
+
+RUN echo "\
+	deb http://nginx.org/packages/ubuntu/ trusty nginx\n\
+	deb-src http://nginx.org/packages/ubuntu/ trusty nginx\
+	" >> /etc/apt/sources.list
+
+RUN apt-get update && apt-get install nginx
+
+RUN apt-get clean \
   && apt-get autoclean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+
+EXPOSE 80
